@@ -379,7 +379,7 @@
                     <div id="brokenMonthContainer" class="hidden space-y-2 pt-1 border-t border-amber-200">
                         <div>
                             <label class="block text-[11px] font-medium text-amber-800 mb-0.5">當月實際在職天數</label>
-                            <input type="number" id="editBrokenDays" min="1" max="31" value="15" class="w-full border border-amber-300 rounded p-1.5 text-xs bg-white">
+                            <input type="number" id="editBrokenDays" min="1" max="31" value="17" class="w-full border border-amber-300 rounded p-1.5 text-xs bg-white">
                         </div>
                         <div>
                             <label class="block text-[11px] font-medium text-amber-800 mb-0.5">計算基準分母（勞保局規範建議選 30 天）</label>
@@ -431,7 +431,7 @@
     <script>
         // Default Data with broken month properties
         let employees = JSON.parse(localStorage.getItem('studio_employees')) || [
-            { id: 1, name: '林志明', idNumber: 'A123456789', title: '資深視覺設計師', basePay: 45000, allowance: 5000, dependents: 1, isBrokenMonth: false, brokenDays: 15, brokenDenominator: '30', overtime: 2500, festivalBonus: 5000, perfBonus: 3000, newHireBonus: 0, bonus: 0, leaveDeduct: 0, tax: 0 },
+            { id: 1, name: '林志明', idNumber: 'A123456789', title: '資深視覺設計師', basePay: 33000, allowance: 3300, dependents: 1, isBrokenMonth: false, brokenDays: 17, brokenDenominator: '30', overtime: 2500, festivalBonus: 5000, perfBonus: 3000, newHireBonus: 0, bonus: 0, leaveDeduct: 0, tax: 0 },
             { id: 2, name: '陳美玲', idNumber: 'B223456789', title: 'UI/UX 互動設計師', basePay: 38000, allowance: 3000, dependents: 0, isBrokenMonth: false, brokenDays: 15, brokenDenominator: '30', overtime: 1200, festivalBonus: 0, perfBonus: 2000, newHireBonus: 10000, bonus: 0, leaveDeduct: 500, tax: 0 },
             { id: 3, name: '王大為', idNumber: 'C134567890', title: '前端工程師', basePay: 55000, allowance: 10000, dependents: 2, isBrokenMonth: false, brokenDays: 15, brokenDenominator: '30', overtime: 3000, festivalBonus: 5000, perfBonus: 5000, newHireBonus: 0, bonus: 0, leaveDeduct: 0, tax: 0 }
         ];
@@ -503,7 +503,6 @@
                     const rows = XLSX.utils.sheet_to_json(worksheet, {header: 1});
 
                     let importedCount = 0;
-                    // Start from index 2 (Row 3 onwards, as instructed: rows 1 and 2 are header/example)
                     for (let i = 2; i < rows.length; i++) {
                         const row = rows[i];
                         if (!row || (!row[1] && !row[2])) continue;
@@ -545,11 +544,11 @@
                                 email,
                                 emergencyContact,
                                 emergencyPhone,
-                                basePay: 38000,
-                                allowance: 3000,
+                                basePay: 33000,
+                                allowance: 3300,
                                 dependents: 0,
                                 isBrokenMonth: false,
-                                brokenDays: 15,
+                                brokenDays: 17,
                                 brokenDenominator: '30',
                                 overtime: 0,
                                 festivalBonus: 0,
@@ -575,7 +574,7 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // Calculation Logic: Labor Ins (12.5% rate, daily if broken) & Health Ins (monthly)
+        // Calculation Logic: Corrected to use FULL monthly salary for labor tier lookup
         function calculateInsurance(emp) {
             let basePay = Number(emp.basePay);
             let allowance = Number(emp.allowance);
@@ -605,10 +604,8 @@
             let healthTier = getHealthTier(fullMonthlyBasic);
             let healthIns = Math.round(healthTier * 0.0517 * 0.3 * (1 + Number(emp.dependents) * 0.61));
 
-            // 2. 勞保費用按日算（費率 12.5% = 11.5%普通事故 + 1%就業保險；勞工自付 20%）
-            let totalBasicForLabor = basePay + allowance;
-            let laborTier = getLaborTier(totalBasicForLabor);
-            
+            // 2. 勞保費用按日算：使用「全月原投保薪資」對應級距，再按日在職比例計算
+            let fullLaborTier = getLaborTier(fullMonthlyBasic);
             let laborRate = 0.125;      // 12.5% 總費率
             let employeeShare = 0.20;   // 勞工自付 20%
             
@@ -618,16 +615,16 @@
                 let denominator = emp.brokenDenominator === 'calendar' ? getDaysInMonth(monthVal) : (Number(emp.brokenDenominator) || 30);
                 let laborRatio = Number(emp.brokenDays) / denominator;
                 if (laborRatio > 1) laborRatio = 1;
-                // 公式：投保薪資 × 12.5% × 20% × (在職天數 / 分母)
-                laborIns = Math.round(laborTier * laborRate * employeeShare * laborRatio);
+                // 公式：全月投保薪資 × 12.5% × 20% × (在職天數 / 分母)
+                laborIns = Math.round(fullLaborTier * laborRate * employeeShare * laborRatio);
             } else {
-                // 全月公式：投保薪資 × 12.5% × 20%
-                laborIns = Math.round(laborTier * laborRate * employeeShare);
+                laborIns = Math.round(fullLaborTier * laborRate * employeeShare);
             }
 
-            let employerLabor = Math.round(laborTier * 0.095);
-            let employerPension = Math.round(laborTier * 0.06);
+            let employerLabor = Math.round(fullLaborTier * 0.095);
+            let employerPension = Math.round(fullLaborTier * 0.06);
 
+            let totalBasicForLabor = basePay + allowance;
             let totalEarn = totalBasicForLabor + 
                             Number(emp.overtime || 0) + 
                             Number(emp.festivalBonus || 0) + 
@@ -643,7 +640,7 @@
                 adjustedAllowance: allowance,
                 breakdownNote,
                 baseNoteText,
-                laborTier,
+                laborTier: fullLaborTier,
                 healthTier,
                 laborIns,
                 healthIns,
@@ -737,7 +734,7 @@
                 allowance: parseFloat(document.getElementById('empAllowance').value),
                 dependents: parseInt(document.getElementById('empDependents').value),
                 isBrokenMonth: index >= 0 ? employees[index].isBrokenMonth : false,
-                brokenDays: index >= 0 ? employees[index].brokenDays : 15,
+                brokenDays: index >= 0 ? employees[index].brokenDays : 17,
                 brokenDenominator: index >= 0 ? employees[index].brokenDenominator : '30',
                 overtime: index >= 0 ? employees[index].overtime : 0,
                 festivalBonus: index >= 0 ? employees[index].festivalBonus : 0,
@@ -815,7 +812,7 @@
             
             const isBroken = employees[index].isBrokenMonth || false;
             document.getElementById('editIsBrokenMonth').checked = isBroken;
-            document.getElementById('editBrokenDays').value = employees[index].brokenDays || 15;
+            document.getElementById('editBrokenDays').value = employees[index].brokenDays || 17;
             document.getElementById('editBrokenDenominator').value = employees[index].brokenDenominator || '30';
             toggleBrokenMonthInputs();
 
@@ -838,7 +835,7 @@
             const index = parseInt(document.getElementById('editPayrollIndex').value);
             if (index >= 0) {
                 employees[index].isBrokenMonth = document.getElementById('editIsBrokenMonth').checked;
-                employees[index].brokenDays = parseFloat(document.getElementById('editBrokenDays').value) || 15;
+                employees[index].brokenDays = parseFloat(document.getElementById('editBrokenDays').value) || 17;
                 employees[index].brokenDenominator = document.getElementById('editBrokenDenominator').value;
 
                 employees[index].overtime = parseFloat(document.getElementById('editOvertime').value) || 0;
