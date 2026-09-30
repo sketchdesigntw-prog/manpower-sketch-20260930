@@ -12,6 +12,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- html2pdf.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- SheetJS (XLSX) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -39,7 +41,7 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-wide">草圖設計工作室</h1>
-                    <p class="text-xs text-studio-100 opacity-80">專業薪資管理、獎金與破月自動折算系統</p>
+                    <p class="text-xs text-studio-100 opacity-80">專業薪資管理、Excel匯入、獎金與破月自動折算系統</p>
                 </div>
             </div>
             <nav class="flex flex-wrap gap-2 text-sm">
@@ -60,11 +62,17 @@
             <div class="bg-white p-6 rounded-xl shadow-sm border border-studio-100 flex justify-between items-center flex-wrap gap-4">
                 <div>
                     <h2 class="text-lg font-bold text-studio-700"><i class="fa-solid fa-user-gear mr-2"></i>員工名冊與投保設定</h2>
-                    <p class="text-xs text-gray-500 mt-0.5">勞保最高 45,800 封頂；健保無上限對照。</p>
+                    <p class="text-xs text-gray-500 mt-0.5">勞保最高 45,800 封頂；健保無上限對照。支援指定 Excel 格式一鍵匯入。</p>
                 </div>
-                <button onclick="openEmployeeModal()" class="bg-studio-700 hover:bg-studio-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow flex items-center">
-                    <i class="fa-solid fa-user-plus mr-1.5"></i> 新增員工
-                </button>
+                <div class="flex items-center space-x-2">
+                    <label class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow cursor-pointer flex items-center">
+                        <i class="fa-solid fa-file-excel mr-1.5"></i> 匯入 Excel 員工名冊
+                        <input type="file" id="excelImportFile" accept=".xlsx, .xls, .csv" onchange="importExcelEmployee(event)" class="hidden">
+                    </label>
+                    <button onclick="openEmployeeModal()" class="bg-studio-700 hover:bg-studio-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow flex items-center">
+                        <i class="fa-solid fa-user-plus mr-1.5"></i> 新增員工
+                    </button>
+                </div>
             </div>
 
             <div class="bg-white rounded-xl shadow-sm border border-studio-100 overflow-hidden">
@@ -132,7 +140,7 @@
                 <div class="flex flex-wrap justify-between items-center gap-4">
                     <div>
                         <h2 class="text-lg font-bold text-studio-700"><i class="fa-solid fa-file-invoice-dollar mr-2"></i>專業版薪資單預覽與 PDF 匯出</h2>
-                        <p class="text-xs text-gray-500 mt-0.5">您可以自訂存檔路徑（資料夾），並將精美排版的薪資單直接匯出為 PDF 檔案。</p>
+                        <p class="text-xs text-gray-500 mt-0.5">您可以自訂存檔路徑（資料夾），並將精美排版的薪資明細直接匯出為 PDF 檔案。</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-3">
                         <select id="payslipEmployeeSelect" onchange="renderPayslipPreview()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-studio-700 focus:outline-none">
@@ -479,6 +487,92 @@
                 if (totalSalary <= tier) return tier;
             }
             return healthTiers[healthTiers.length - 1];
+        }
+
+        // Excel Import Handler
+        function importExcelEmployee(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const rows = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+
+                    let importedCount = 0;
+                    // Start from index 2 (Row 3 onwards, as instructed: rows 1 and 2 are header/example)
+                    for (let i = 2; i < rows.length; i++) {
+                        const row = rows[i];
+                        if (!row || (!row[1] && !row[2])) continue;
+
+                        let idNumber = row[1] ? String(row[1]).trim().toUpperCase() : '';
+                        let name = row[2] ? String(row[2]).trim() : '';
+                        if (!name && !idNumber) continue;
+
+                        let englishName = row[3] ? String(row[3]).trim() : '';
+                        let nationality = row[4] ? String(row[4]).trim() : '';
+                        let birthDate = row[5] ? String(row[5]).trim() : '';
+                        let phone = row[6] ? String(row[6]).trim() : '';
+                        let email = row[7] ? String(row[7]).trim() : '';
+                        let title = row[8] ? String(row[8]).trim() : '設計師';
+                        let emergencyContact = row[9] ? String(row[9]).trim() : '';
+                        let emergencyPhone = row[10] ? String(row[10]).trim() : '';
+
+                        let existingIndex = employees.findIndex(emp => emp.idNumber === idNumber && idNumber !== '');
+                        if (existingIndex >= 0) {
+                            employees[existingIndex].name = name || employees[existingIndex].name;
+                            employees[existingIndex].title = title || employees[existingIndex].title;
+                            employees[existingIndex].englishName = englishName;
+                            employees[existingIndex].nationality = nationality;
+                            employees[existingIndex].birthDate = birthDate;
+                            employees[existingIndex].phone = phone;
+                            employees[existingIndex].email = email;
+                            employees[existingIndex].emergencyContact = emergencyContact;
+                            employees[existingIndex].emergencyPhone = emergencyPhone;
+                        } else {
+                            employees.push({
+                                id: Date.now() + i,
+                                name: name || '未命名',
+                                idNumber: idNumber || `ID${i}`,
+                                title: title || '設計師',
+                                englishName,
+                                nationality,
+                                birthDate,
+                                phone,
+                                email,
+                                emergencyContact,
+                                emergencyPhone,
+                                basePay: 38000,
+                                allowance: 3000,
+                                dependents: 0,
+                                isBrokenMonth: false,
+                                brokenDays: 15,
+                                brokenDenominator: '30',
+                                overtime: 0,
+                                festivalBonus: 0,
+                                perfBonus: 0,
+                                newHireBonus: 0,
+                                bonus: 0,
+                                leaveDeduct: 0,
+                                tax: 0
+                            });
+                        }
+                        importedCount++;
+                    }
+
+                    saveToStorage();
+                    renderEmployees();
+                    alert(`成功從 Excel 匯入/更新 ${importedCount} 位員工資料！`);
+                    event.target.value = '';
+                } catch (err) {
+                    console.error(err);
+                    alert('解析 Excel 檔案失敗，請確認檔案格式是否與指定版面相符。');
+                }
+            };
+            reader.readAsArrayBuffer(file);
         }
 
         // Calculation Logic with Broken Month Support
