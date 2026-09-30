@@ -41,7 +41,7 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-wide">草圖設計工作室</h1>
-                    <p class="text-xs text-studio-100 opacity-80">專業薪資管理、Excel匯入、勞保按日算與健保按月算系統</p>
+                    <p class="text-xs text-studio-100 opacity-80">專業薪資管理、Excel匯入、勞保12.5%按日算與健保按月算系統</p>
                 </div>
             </div>
             <nav class="flex flex-wrap gap-2 text-sm">
@@ -62,7 +62,7 @@
             <div class="bg-white p-6 rounded-xl shadow-sm border border-studio-100 flex justify-between items-center flex-wrap gap-4">
                 <div>
                     <h2 class="text-lg font-bold text-studio-700"><i class="fa-solid fa-user-gear mr-2"></i>員工名冊與投保設定</h2>
-                    <p class="text-xs text-gray-500 mt-0.5">勞保最高 45,800 封頂；健保無上限對照。支援指定 Excel 格式一鍵匯入。</p>
+                    <p class="text-xs text-gray-500 mt-0.5">勞保最高 45,800 封頂（費率 12.5%）；健保無上限對照。支援指定 Excel 格式一鍵匯入。</p>
                 </div>
                 <div class="flex items-center space-x-2">
                     <label class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow cursor-pointer flex items-center">
@@ -102,7 +102,7 @@
             <div class="bg-white p-6 rounded-xl shadow-sm border border-studio-100 flex flex-wrap justify-between items-center gap-4">
                 <div>
                     <h2 class="text-lg font-bold text-studio-700"><i class="fa-solid fa-calculator mr-2"></i>每月薪資結算與破月折算</h2>
-                    <p class="text-xs text-gray-500 mt-0.5">勞保按日算、健保按月算，支援三節、績效、到職獎金及破月比例計算。</p>
+                    <p class="text-xs text-gray-500 mt-0.5">勞保採 12.5% 按日算、健保按月算，支援三節、績效、到職獎金及破月比例計算。</p>
                 </div>
                 <div class="flex items-center space-x-3">
                     <label class="text-sm font-medium text-gray-700">薪資月份：</label>
@@ -121,7 +121,7 @@
                                 <th class="p-3.5">員工</th>
                                 <th class="p-3.5">折算後底薪+加給</th>
                                 <th class="p-3.5">獎金項目 (三節/績效/到職)</th>
-                                <th class="p-3.5">勞(按日)/健(按月)自付</th>
+                                <th class="p-3.5">勞(12.5%按日)/健(按月)自付</th>
                                 <th class="p-3.5 font-bold text-studio-700">實發金額</th>
                                 <th class="p-3.5 text-center">調整變動與破月設定</th>
                             </tr>
@@ -230,7 +230,7 @@
                                 </div>
                                 <table class="w-full text-left">
                                     <tbody class="divide-y divide-gray-100 text-xs">
-                                        <tr><td class="p-2.5 text-gray-700">勞保費 (自付/按日)</td><td id="pLaborIns" class="p-2.5 text-right font-medium text-red-600">NT$ 0</td></tr>
+                                        <tr><td class="p-2.5 text-gray-700">勞保費 (12.5%自付/按日)</td><td id="pLaborIns" class="p-2.5 text-right font-medium text-red-600">NT$ 0</td></tr>
                                         <tr><td class="p-2.5 text-gray-700">健保費 (自付/按月)</td><td id="pHealthIns" class="p-2.5 text-right font-medium text-red-600">NT$ 0</td></tr>
                                         <tr><td class="p-2.5 text-gray-700">請假扣款</td><td id="pLeaveDeduct" class="p-2.5 text-right font-medium text-red-600">NT$ 0</td></tr>
                                         <tr><td class="p-2.5 text-gray-700">所得稅 / 其他代扣</td><td id="pTax" class="p-2.5 text-right font-medium text-red-600">NT$ 0</td></tr>
@@ -248,7 +248,7 @@
                     <div class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-4 rounded-xl shadow-md flex justify-between items-center">
                         <div>
                             <span class="text-xs font-bold uppercase tracking-wider block opacity-90">本月實發金額 (Net Pay: A - B)</span>
-                            <span class="text-[11px] opacity-75">已自動扣除勞保(按日)與健保(按月)自付額及相關假勤扣款</span>
+                            <span class="text-[11px] opacity-75">已自動扣除勞保(12.5%按日)與健保(按月)自付額及相關假勤扣款</span>
                         </div>
                         <div class="text-2xl font-black tracking-tight" id="pNetPay">NT$ 0</div>
                     </div>
@@ -373,7 +373,7 @@
                     <div class="flex items-center justify-between">
                         <label class="font-bold text-amber-900 text-xs flex items-center cursor-pointer">
                             <input type="checkbox" id="editIsBrokenMonth" onchange="toggleBrokenMonthInputs()" class="mr-1.5 h-4 w-4 text-amber-600 focus:ring-amber-500 rounded">
-                            啟用破月計算（到職/離職當月，勞保將按日折算）
+                            啟用破月計算（到職/離職當月，勞保採 12.5% 按日折算）
                         </label>
                     </div>
                     <div id="brokenMonthContainer" class="hidden space-y-2 pt-1 border-t border-amber-200">
@@ -382,7 +382,7 @@
                             <input type="number" id="editBrokenDays" min="1" max="31" value="15" class="w-full border border-amber-300 rounded p-1.5 text-xs bg-white">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-medium text-amber-800 mb-0.5">計算基準分母</label>
+                            <label class="block text-[11px] font-medium text-amber-800 mb-0.5">計算基準分母（勞保局規範建議選 30 天）</label>
                             <select id="editBrokenDenominator" class="w-full border border-amber-300 rounded p-1.5 text-xs bg-white">
                                 <option value="30">固定 30 天制 (薪資與勞保費 × 天數 / 30)</option>
                                 <option value="calendar">當月實際日曆天數 (例如 9月30天 / 10月31天)</option>
@@ -575,7 +575,7 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // Calculation Logic with Labor (Daily) & Health (Monthly) separation
+        // Calculation Logic: Labor Ins (12.5% rate, daily if broken) & Health Ins (monthly)
         function calculateInsurance(emp) {
             let basePay = Number(emp.basePay);
             let allowance = Number(emp.allowance);
@@ -596,20 +596,34 @@
 
                 basePay = Math.round(basePay * ratio);
                 allowance = Math.round(allowance * ratio);
-                breakdownNote = `破月計薪：在職 ${emp.brokenDays} 天 / 分母 ${denominator} 天 (勞保按日折算)`;
+                breakdownNote = `破月計薪：在職 ${emp.brokenDays} 天 / 分母 ${denominator} 天 (勞保 12.5% 按日)`;
                 baseNoteText = `(破月折算)`;
             }
 
-            // 1. 健保按月算：以全月原投保薪資（未折算前）計算健保費，不隨破月天數折算
+            // 1. 健保按月算：以全月原投保薪資計算
             let fullMonthlyBasic = Number(emp.basePay) + Number(emp.allowance);
             let healthTier = getHealthTier(fullMonthlyBasic);
             let healthIns = Math.round(healthTier * 0.0517 * 0.3 * (1 + Number(emp.dependents) * 0.61));
 
-            // 2. 勞保費用按日算：以折算後薪資對應投保級距，並依在職天數比例按日計收
+            // 2. 勞保費用按日算（費率 12.5% = 11.5%普通事故 + 1%就業保險；勞工自付 20%）
             let totalBasicForLabor = basePay + allowance;
             let laborTier = getLaborTier(totalBasicForLabor);
-            let fullLaborIns = Math.round(laborTier * 0.025);
-            let laborIns = emp.isBrokenMonth ? Math.round(fullLaborIns * ratio) : fullLaborIns;
+            
+            let laborRate = 0.125;      // 12.5% 總費率
+            let employeeShare = 0.20;   // 勞工自付 20%
+            
+            let laborIns;
+            if (emp.isBrokenMonth) {
+                const monthVal = document.getElementById('payrollMonth') ? document.getElementById('payrollMonth').value : '2026-09';
+                let denominator = emp.brokenDenominator === 'calendar' ? getDaysInMonth(monthVal) : (Number(emp.brokenDenominator) || 30);
+                let laborRatio = Number(emp.brokenDays) / denominator;
+                if (laborRatio > 1) laborRatio = 1;
+                // 公式：投保薪資 × 12.5% × 20% × (在職天數 / 分母)
+                laborIns = Math.round(laborTier * laborRate * employeeShare * laborRatio);
+            } else {
+                // 全月公式：投保薪資 × 12.5% × 20%
+                laborIns = Math.round(laborTier * laborRate * employeeShare);
+            }
 
             let employerLabor = Math.round(laborTier * 0.095);
             let employerPension = Math.round(laborTier * 0.06);
@@ -675,7 +689,7 @@
                         <td class="p-3.5 font-medium">NT$ ${Number(emp.basePay).toLocaleString()}</td>
                         <td class="p-3.5 text-gray-600">NT$ ${Number(emp.allowance).toLocaleString()}</td>
                         <td class="p-3.5 text-xs text-gray-600">
-                            <div>勞: NT$ ${calc.laborTier.toLocaleString()} <span class="text-[10px] text-gray-400">(45800上限)</span></div>
+                            <div>勞(12.5%): NT$ ${calc.laborTier.toLocaleString()} <span class="text-[10px] text-gray-400">(45800上限)</span></div>
                             <div>健: NT$ ${calc.healthTier.toLocaleString()} <span class="text-[10px] text-emerald-600">(無上限)</span></div>
                         </td>
                         <td class="p-3.5">${emp.dependents} 人</td>
@@ -770,7 +784,7 @@
                             <div>到職: NT$ ${Number(emp.newHireBonus || 0).toLocaleString()}</div>
                         </td>
                         <td class="p-3.5 text-xs text-gray-600">
-                            <div>勞(日): NT$ ${calc.laborIns} / 健(月): NT$ ${calc.healthIns}</div>
+                            <div>勞(12.5%日): NT$ ${calc.laborIns} / 健(月): NT$ ${calc.healthIns}</div>
                         </td>
                         <td class="p-3.5 font-bold text-emerald-600">NT$ ${calc.netPay.toLocaleString()}</td>
                         <td class="p-3.5 text-center">
@@ -842,7 +856,7 @@
 
         function calculateAllPayroll() {
             renderPayrollTable();
-            alert('所有員工薪資、獎金與勞(按日)健(按月)保費已重新試算完畢！');
+            alert('所有員工薪資、獎金與勞保(12.5%按日)健保(按月)已重新試算完畢！');
         }
 
         // --- 3. Payslip Preview & PDF Export ---
