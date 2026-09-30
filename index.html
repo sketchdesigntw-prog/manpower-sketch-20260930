@@ -102,7 +102,7 @@
             <div class="bg-white p-6 rounded-xl shadow-sm border border-studio-100 flex flex-wrap justify-between items-center gap-4">
                 <div>
                     <h2 class="text-lg font-bold text-studio-700"><i class="fa-solid fa-calculator mr-2"></i>每月薪資結算與破月折算</h2>
-                    <p class="text-xs text-gray-500 mt-0.5">勞保採 12.5% 按日算、健保按月算，支援三節、績效、到職獎金及破月比例計算。</p>
+                    <p class="text-xs text-gray-500 mt-0.5">勞保採 12.5% 按日算、健保按月算，支援三節、績效獎金及破月比例計算。</p>
                 </div>
                 <div class="flex items-center space-x-3">
                     <label class="text-sm font-medium text-gray-700">薪資月份：</label>
@@ -120,7 +120,7 @@
                             <tr class="bg-studio-100 text-studio-700 uppercase text-xs font-semibold tracking-wider">
                                 <th class="p-3.5">員工</th>
                                 <th class="p-3.5">折算後底薪+加給</th>
-                                <th class="p-3.5">獎金項目 (三節/績效/到職)</th>
+                                <th class="p-3.5">獎金項目 (三節/績效)</th>
                                 <th class="p-3.5">勞(12.5%按日)/健(按月)自付</th>
                                 <th class="p-3.5 font-bold text-studio-700">實發金額</th>
                                 <th class="p-3.5 text-center">調整變動與破月設定</th>
@@ -210,7 +210,6 @@
                                         <tr><td class="p-2.5 text-gray-700">加班費</td><td id="pOvertime" class="p-2.5 text-right font-medium">NT$ 0</td></tr>
                                         <tr><td class="p-2.5 text-gray-700">三節獎金</td><td id="pFestivalBonus" class="p-2.5 text-right font-medium">NT$ 0</td></tr>
                                         <tr><td class="p-2.5 text-gray-700">績效獎金</td><td id="pPerfBonus" class="p-2.5 text-right font-medium">NT$ 0</td></tr>
-                                        <tr><td class="p-2.5 text-gray-700">新人到職獎金</td><td id="pNewHireBonus" class="p-2.5 text-right font-medium">NT$ 0</td></tr>
                                         <tr><td class="p-2.5 text-gray-700">其他獎金 / 津貼</td><td id="pBonus" class="p-2.5 text-right font-medium">NT$ 0</td></tr>
                                     </tbody>
                                 </table>
@@ -404,10 +403,6 @@
                     <input type="number" id="editPerfBonus" min="0" value="0" class="w-full border border-emerald-300 rounded-lg p-2 focus:ring-2 focus:ring-studio-700 focus:outline-none">
                 </div>
                 <div>
-                    <label class="block font-medium text-gray-700 mb-1 text-emerald-700 font-semibold">新人到職獎金 (NT$)</label>
-                    <input type="number" id="editNewHireBonus" min="0" value="0" class="w-full border border-emerald-300 rounded-lg p-2 focus:ring-2 focus:ring-studio-700 focus:outline-none">
-                </div>
-                <div>
                     <label class="block font-medium text-gray-700 mb-1">其他獎金 / 津貼 (NT$)</label>
                     <input type="number" id="editBonus" min="0" value="0" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-studio-700 focus:outline-none">
                 </div>
@@ -429,11 +424,11 @@
 
     <!-- Script Logic -->
     <script>
-        // Default Data with broken month properties
+        // Default Data without newHireBonus
         let employees = JSON.parse(localStorage.getItem('studio_employees')) || [
-            { id: 1, name: '林志明', idNumber: 'A123456789', title: '資深視覺設計師', basePay: 33000, allowance: 3300, dependents: 1, isBrokenMonth: false, brokenDays: 17, brokenDenominator: '30', overtime: 2500, festivalBonus: 5000, perfBonus: 3000, newHireBonus: 0, bonus: 0, leaveDeduct: 0, tax: 0 },
-            { id: 2, name: '陳美玲', idNumber: 'B223456789', title: 'UI/UX 互動設計師', basePay: 38000, allowance: 3000, dependents: 0, isBrokenMonth: false, brokenDays: 15, brokenDenominator: '30', overtime: 1200, festivalBonus: 0, perfBonus: 2000, newHireBonus: 10000, bonus: 0, leaveDeduct: 500, tax: 0 },
-            { id: 3, name: '王大為', idNumber: 'C134567890', title: '前端工程師', basePay: 55000, allowance: 10000, dependents: 2, isBrokenMonth: false, brokenDays: 15, brokenDenominator: '30', overtime: 3000, festivalBonus: 5000, perfBonus: 5000, newHireBonus: 0, bonus: 0, leaveDeduct: 0, tax: 0 }
+            { id: 1, name: '林志明', idNumber: 'A123456789', title: '資深視覺設計師', basePay: 33000, allowance: 3300, dependents: 1, isBrokenMonth: false, brokenDays: 17, brokenDenominator: '30', overtime: 2500, festivalBonus: 5000, perfBonus: 3000, bonus: 0, leaveDeduct: 0, tax: 0 },
+            { id: 2, name: '陳美玲', idNumber: 'B223456789', title: 'UI/UX 互動設計師', basePay: 38000, allowance: 3000, dependents: 0, isBrokenMonth: false, brokenDays: 15, brokenDenominator: '30', overtime: 1200, festivalBonus: 0, perfBonus: 2000, bonus: 0, leaveDeduct: 500, tax: 0 },
+            { id: 3, name: '王大為', idNumber: 'C134567890', title: '前端工程師', basePay: 55000, allowance: 10000, dependents: 2, isBrokenMonth: false, brokenDays: 15, brokenDenominator: '30', overtime: 3000, festivalBonus: 5000, perfBonus: 5000, bonus: 0, leaveDeduct: 0, tax: 0 }
         ];
 
         let selectedDirectoryHandle = null;
@@ -553,7 +548,6 @@
                                 overtime: 0,
                                 festivalBonus: 0,
                                 perfBonus: 0,
-                                newHireBonus: 0,
                                 bonus: 0,
                                 leaveDeduct: 0,
                                 tax: 0
@@ -574,7 +568,7 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // Calculation Logic: Labor Ins (12.5% rate, ceiling if broken to match 515) & Health Ins (monthly)
+        // Calculation Logic
         function calculateInsurance(emp) {
             let basePay = Number(emp.basePay);
             let allowance = Number(emp.allowance);
@@ -604,7 +598,7 @@
             let healthTier = getHealthTier(fullMonthlyBasic);
             let healthIns = Math.round(healthTier * 0.0517 * 0.3 * (1 + Number(emp.dependents) * 0.61));
 
-            // 2. 勞保費用按日算：使用「全月原投保薪資」對應級距，並採無條件進位 (Math.ceil) 匹配特定平台 515 算法
+            // 2. 勞保費用按日算：使用「全月原投保薪資」對應級距，並採無條件進位 (Math.ceil) 匹配 515 算法
             let fullLaborTier = getLaborTier(fullMonthlyBasic);
             let laborRate = 0.125;      // 12.5% 總費率
             let employeeShare = 0.20;   // 勞工自付 20%
@@ -615,7 +609,6 @@
                 let denominator = emp.brokenDenominator === 'calendar' ? getDaysInMonth(monthVal) : (Number(emp.brokenDenominator) || 30);
                 let laborRatio = Number(emp.brokenDays) / denominator;
                 if (laborRatio > 1) laborRatio = 1;
-                // 公式：全月投保薪資 × 12.5% × 20% × (在職天數 / 分母) -> 無條件進位 (Math.ceil)
                 laborIns = Math.ceil(fullLaborTier * laborRate * employeeShare * laborRatio);
             } else {
                 laborIns = Math.round(fullLaborTier * laborRate * employeeShare);
@@ -629,7 +622,6 @@
                             Number(emp.overtime || 0) + 
                             Number(emp.festivalBonus || 0) + 
                             Number(emp.perfBonus || 0) + 
-                            Number(emp.newHireBonus || 0) + 
                             Number(emp.bonus || 0);
 
             let totalDeduct = laborIns + healthIns + Number(emp.leaveDeduct || 0) + Number(emp.tax || 0);
@@ -739,7 +731,6 @@
                 overtime: index >= 0 ? employees[index].overtime : 0,
                 festivalBonus: index >= 0 ? employees[index].festivalBonus : 0,
                 perfBonus: index >= 0 ? employees[index].perfBonus : 0,
-                newHireBonus: index >= 0 ? employees[index].newHireBonus : 0,
                 bonus: index >= 0 ? employees[index].bonus : 0,
                 leaveDeduct: index >= 0 ? employees[index].leaveDeduct : 0,
                 tax: index >= 0 ? employees[index].tax : 0
@@ -778,7 +769,6 @@
                         <td class="p-3.5 text-xs text-emerald-700 font-medium">
                             <div>三節: NT$ ${Number(emp.festivalBonus || 0).toLocaleString()}</div>
                             <div>績效: NT$ ${Number(emp.perfBonus || 0).toLocaleString()}</div>
-                            <div>到職: NT$ ${Number(emp.newHireBonus || 0).toLocaleString()}</div>
                         </td>
                         <td class="p-3.5 text-xs text-gray-600">
                             <div>勞(12.5%日): NT$ ${calc.laborIns} / 健(月): NT$ ${calc.healthIns}</div>
@@ -819,7 +809,6 @@
             document.getElementById('editOvertime').value = employees[index].overtime || 0;
             document.getElementById('editFestivalBonus').value = employees[index].festivalBonus || 0;
             document.getElementById('editPerfBonus').value = employees[index].perfBonus || 0;
-            document.getElementById('editNewHireBonus').value = employees[index].newHireBonus || 0;
             document.getElementById('editBonus').value = employees[index].bonus || 0;
             document.getElementById('editLeaveDeduct').value = employees[index].leaveDeduct || 0;
             document.getElementById('editTax').value = employees[index].tax || 0;
@@ -841,7 +830,6 @@
                 employees[index].overtime = parseFloat(document.getElementById('editOvertime').value) || 0;
                 employees[index].festivalBonus = parseFloat(document.getElementById('editFestivalBonus').value) || 0;
                 employees[index].perfBonus = parseFloat(document.getElementById('editPerfBonus').value) || 0;
-                employees[index].newHireBonus = parseFloat(document.getElementById('editNewHireBonus').value) || 0;
                 employees[index].bonus = parseFloat(document.getElementById('editBonus').value) || 0;
                 employees[index].leaveDeduct = parseFloat(document.getElementById('editLeaveDeduct').value) || 0;
                 employees[index].tax = parseFloat(document.getElementById('editTax').value) || 0;
@@ -890,7 +878,6 @@
             document.getElementById('pOvertime').innerText = `NT$ ${Number(emp.overtime || 0).toLocaleString()}`;
             document.getElementById('pFestivalBonus').innerText = `NT$ ${Number(emp.festivalBonus || 0).toLocaleString()}`;
             document.getElementById('pPerfBonus').innerText = `NT$ ${Number(emp.perfBonus || 0).toLocaleString()}`;
-            document.getElementById('pNewHireBonus').innerText = `NT$ ${Number(emp.newHireBonus || 0).toLocaleString()}`;
             document.getElementById('pBonus').innerText = `NT$ ${Number(emp.bonus || 0).toLocaleString()}`;
             document.getElementById('pTotalEarn').innerText = `NT$ ${calc.totalEarn.toLocaleString()}`;
 
@@ -983,7 +970,6 @@
             let totalAllow = employees.reduce((acc, e) => acc + calculateInsurance(e).adjustedAllowance, 0);
             let totalFest = employees.reduce((acc, e) => acc + Number(e.festivalBonus || 0), 0);
             let totalPerf = employees.reduce((acc, e) => acc + Number(e.perfBonus || 0), 0);
-            let totalNew = employees.reduce((acc, e) => acc + Number(e.newHireBonus || 0), 0);
 
             let totalEmployerCost = employees.reduce((acc, e) => {
                 let c = calculateInsurance(e);
@@ -1000,10 +986,10 @@
             salaryPieChartInstance = new Chart(pieCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['折算本薪', '職務加給', '三節獎金', '績效獎金', '到職獎金'],
+                    labels: ['折算本薪', '職務加給', '三節獎金', '績效獎金'],
                     datasets: [{
-                        data: [totalBase, totalAllow, totalFest, totalPerf, totalNew],
-                        backgroundColor: ['#2c3e50', '#27ae60', '#3498db', '#f39c12', '#9b59b6']
+                        data: [totalBase, totalAllow, totalFest, totalPerf],
+                        backgroundColor: ['#2c3e50', '#27ae60', '#3498db', '#f39c12']
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
