@@ -248,7 +248,7 @@
                     <div class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-4 rounded-xl shadow-md flex justify-between items-center">
                         <div>
                             <span class="text-xs font-bold uppercase tracking-wider block opacity-90">本月實發金額 (Net Pay: A - B)</span>
-                            <span class="text-[11px] opacity-75">已自動扣除勞保(12.5%按日)與健保(按月)自付額及相關假勤扣款</span>
+                            <span class="text-[11px] opacity-75">已自動扣除勞保(12.5%按日進位)與健保(按月)自付額及相關假勤扣款</span>
                         </div>
                         <div class="text-2xl font-black tracking-tight" id="pNetPay">NT$ 0</div>
                     </div>
@@ -373,7 +373,7 @@
                     <div class="flex items-center justify-between">
                         <label class="font-bold text-amber-900 text-xs flex items-center cursor-pointer">
                             <input type="checkbox" id="editIsBrokenMonth" onchange="toggleBrokenMonthInputs()" class="mr-1.5 h-4 w-4 text-amber-600 focus:ring-amber-500 rounded">
-                            啟用破月計算（到職/離職當月，勞保採 12.5% 按日折算）
+                            啟用破月計算（到職/離職當月，勞保採 12.5% 按日無條件進位）
                         </label>
                     </div>
                     <div id="brokenMonthContainer" class="hidden space-y-2 pt-1 border-t border-amber-200">
@@ -574,7 +574,7 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // Calculation Logic: Corrected to use FULL monthly salary for labor tier lookup
+        // Calculation Logic: Labor Ins (12.5% rate, ceiling if broken to match 515) & Health Ins (monthly)
         function calculateInsurance(emp) {
             let basePay = Number(emp.basePay);
             let allowance = Number(emp.allowance);
@@ -604,7 +604,7 @@
             let healthTier = getHealthTier(fullMonthlyBasic);
             let healthIns = Math.round(healthTier * 0.0517 * 0.3 * (1 + Number(emp.dependents) * 0.61));
 
-            // 2. 勞保費用按日算：使用「全月原投保薪資」對應級距，再按日在職比例計算
+            // 2. 勞保費用按日算：使用「全月原投保薪資」對應級距，並採無條件進位 (Math.ceil) 匹配特定平台 515 算法
             let fullLaborTier = getLaborTier(fullMonthlyBasic);
             let laborRate = 0.125;      // 12.5% 總費率
             let employeeShare = 0.20;   // 勞工自付 20%
@@ -615,8 +615,8 @@
                 let denominator = emp.brokenDenominator === 'calendar' ? getDaysInMonth(monthVal) : (Number(emp.brokenDenominator) || 30);
                 let laborRatio = Number(emp.brokenDays) / denominator;
                 if (laborRatio > 1) laborRatio = 1;
-                // 公式：全月投保薪資 × 12.5% × 20% × (在職天數 / 分母)
-                laborIns = Math.round(fullLaborTier * laborRate * employeeShare * laborRatio);
+                // 公式：全月投保薪資 × 12.5% × 20% × (在職天數 / 分母) -> 無條件進位 (Math.ceil)
+                laborIns = Math.ceil(fullLaborTier * laborRate * employeeShare * laborRatio);
             } else {
                 laborIns = Math.round(fullLaborTier * laborRate * employeeShare);
             }
@@ -853,7 +853,7 @@
 
         function calculateAllPayroll() {
             renderPayrollTable();
-            alert('所有員工薪資、獎金與勞保(12.5%按日)健保(按月)已重新試算完畢！');
+            alert('所有員工薪資、獎金與勞保(12.5%按日進位)健保(按月)已重新試算完畢！');
         }
 
         // --- 3. Payslip Preview & PDF Export ---
